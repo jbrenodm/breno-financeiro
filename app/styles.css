@@ -272,6 +272,9 @@ a.btn { text-decoration: none; color: inherit; }
   main#view > * { grid-column: 1 / -1; }
   main#view > .group { grid-column: auto; }
   main#view > .group[data-key="rec"] { grid-column: 1 / -1; }
+  main#view:has(> .g-bloco) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  main#view > .g-bloco { grid-column: auto; }
+  main#view > .g-bloco:last-child { grid-column: 1 / -1; }
   .tabbar {
     position: fixed; top: 0; bottom: 0; left: 0; right: auto; width: 220px;
     display: flex; flex-direction: column; gap: 4px; padding: 16px 12px;
@@ -283,6 +286,5 @@ a.btn { text-decoration: none; color: inherit; }
   }
   .tabbar button.active { background: var(--accent-soft); }
   .tabbar svg { width: 20px; height: 20px; }
-  .chart svg { max-height: 340px; }
   .toast { left: calc(50% + 110px); }
 }

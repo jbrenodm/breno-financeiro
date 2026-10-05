@@ -405,17 +405,23 @@ function renderGraficos(v) {
   const maxG = Math.max(1, ...totAno.map((t) => t.v));
   const hasData = monthsWithData(c) > 0;
   v.innerHTML = `
-    <h2 class="section-title">Receitas × Despesas e Investimentos</h2>
-    <section class="card">
-      <div class="legend"><span><i style="background:var(--s-rec)"></i>Receitas</span><span><i style="background:var(--s-desp)"></i>Gasto real</span><span><i style="background:var(--s-inv)"></i>Investimentos</span></div>
-      <div class="chart" id="ch1"></div>
-    </section>
-    <h2 class="section-title">Saldo mensal (Receitas − Despesas)</h2>
-    <section class="card"><div class="chart" id="ch2"></div></section>
-    <h2 class="section-title">Despesas por grupo em ${ui.year}</h2>
-    <section class="card">
-      ${hasData ? `<div class="hbar">${totAno.map((t) => `<span>${esc(t.nome)}</span><span class="num">${fmt(t.v)}</span><div class="bar ${t.inv ? 'inv' : ''}"><span style="width:${(t.v / maxG) * 100}%"></span></div>`).join('')}</div>` : '<div class="empty">Sem lançamentos neste ano.</div>'}
-    </section>`;
+    <div class="g-bloco">
+      <h2 class="section-title">Receitas × Despesas e Investimentos</h2>
+      <section class="card">
+        <div class="legend"><span><i style="background:var(--s-rec)"></i>Receitas</span><span><i style="background:var(--s-desp)"></i>Gasto real</span><span><i style="background:var(--s-inv)"></i>Investimentos</span></div>
+        <div class="chart" id="ch1"></div>
+      </section>
+    </div>
+    <div class="g-bloco">
+      <h2 class="section-title">Saldo mensal (Receitas − Despesas)</h2>
+      <section class="card"><div class="chart" id="ch2"></div></section>
+    </div>
+    <div class="g-bloco">
+      <h2 class="section-title">Despesas por grupo em ${ui.year}</h2>
+      <section class="card">
+        ${hasData ? `<div class="hbar">${totAno.map((t) => `<span>${esc(t.nome)}</span><span class="num">${fmt(t.v)}</span><div class="bar ${t.inv ? 'inv' : ''}"><span style="width:${(t.v / maxG) * 100}%"></span></div>`).join('')}</div>` : '<div class="empty">Sem lançamentos neste ano.</div>'}
+      </section>
+    </div>`;
   barChart($('#ch1', v), c, 'main');
   barChart($('#ch2', v), c, 'saldo');
 }
