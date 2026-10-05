@@ -44,7 +44,7 @@ const GAuth = (() => {
   function silent() {
     if (valid()) return Promise.resolve(true);
     if (!settings.authed || !clientId()) return Promise.resolve(false);
-    return request('none').then(() => true, (e) => { console.info('Renovação silenciosa falhou:', e.message); return false; });
+    return request('none').then(() => true, () => false);
   }
   async function request(prompt) {
     if (!clientId()) throw new Error('Informe o Client ID em Ajustes');
