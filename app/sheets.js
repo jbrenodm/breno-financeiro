@@ -38,6 +38,15 @@ const GAuth = (() => {
   async function get(interactive = false) {
     if (valid()) return token;
     if (!interactive) throw authErr();
+    return request(settings.authed ? '' : 'consent');
+  }
+  /** Tenta renovar sem janela (prompt 'none'). Resolve true se deu certo. */
+  function silent() {
+    if (valid()) return Promise.resolve(true);
+    if (!settings.authed || !clientId()) return Promise.resolve(false);
+    return request('none').then(() => true, (e) => { console.info('Renovação silenciosa falhou:', e.message); return false; });
+  }
+  async function request(prompt) {
     if (!clientId()) throw new Error('Informe o Client ID em Ajustes');
     await loadGis();
     if (!client || clientFor !== clientId()) {
@@ -57,12 +66,12 @@ const GAuth = (() => {
     }
     return new Promise((res, rej) => {
       pending = { res, rej };
-      client.requestAccessToken({ prompt: settings.authed ? '' : 'consent' });
+      client.requestAccessToken({ prompt });
     });
   }
   function clear() { token = null; exp = 0; }
   function revoke() { if (token && window.google?.accounts?.oauth2) google.accounts.oauth2.revoke(token, () => {}); clear(); settings.authed = false; saveSettings(); }
-  return { get, valid, clear, revoke, clientId };
+  return { get, silent, valid, clear, revoke, clientId };
 })();
 
 async function gapi(method, url, body) {
@@ -433,7 +442,8 @@ const Sync = (() => {
   function boot() {
     setInterval(() => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid() && !busy) refresh(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid()) refresh(); });
-    if (mode() === 'local') set('local'); else fail(authErr());
+    if (mode() === 'local') set('local');
+    else GAuth.silent().then((ok) => (ok ? refresh() : fail(authErr())));
   }
   return { setValue, refresh, mutate, setMeta, login, createSheet, linkSheet, disconnect, paint, boot, mode, get pendingCount() { return pending.length; } };
 })();

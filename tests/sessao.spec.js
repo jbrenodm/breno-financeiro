@@ -34,3 +34,41 @@ test('sessão expirada avisa, não grava e o login recupera a planilha', async (
   await A.locator('#syncBtn').click();
   await expect(A.locator('#syncLabel')).toHaveText('Sincronizado');
 });
+
+test('ao recarregar, renova o acesso sem janela', async ({ browser }) => {
+  const fake = new FakeSheets();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
+  const A = await ctx.newPage();
+  await A.clock.setFixedTime(new Date('2026-10-15T12:00:00-03:00'));
+  await attach(A, fake);
+  await A.goto('/');
+  await A.locator('[data-tab="ajustes"]').click();
+  await A.locator('#clientId').fill('cid.apps.googleusercontent.com');
+  await A.locator('#shCreate').click();
+  await expect(A.locator('#sheetStatus')).toHaveText('Planilha criada');
+
+  await A.reload();
+  await expect(A.locator('#syncLabel')).toHaveText('Sincronizado');
+});
+
+test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browser }) => {
+  const fake = new FakeSheets();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
+  const A = await ctx.newPage();
+  await A.clock.setFixedTime(new Date('2026-10-15T12:00:00-03:00'));
+  await attach(A, fake);
+  await A.goto('/');
+  await A.locator('[data-tab="ajustes"]').click();
+  await A.locator('#clientId').fill('cid.apps.googleusercontent.com');
+  await A.locator('#shCreate').click();
+  await expect(A.locator('#sheetStatus')).toHaveText('Planilha criada');
+
+  await A.route('https://accounts.google.com/gsi/client', (r) => r.fulfill({
+    contentType: 'text/javascript',
+    body: `window.google={accounts:{oauth2:{
+      initTokenClient:(o)=>({requestAccessToken:()=>setTimeout(()=>o.callback({error:'immediate_failed'}),5)}),
+      revoke:()=>{}}}}`,
+  }));
+  await A.reload();
+  await expect(A.locator('#syncLabel')).toHaveText('Entrar');
+});
