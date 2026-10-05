@@ -1,0 +1,15 @@
+node_modules/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*
+# arquivos pessoais (planilhas exportadas, backups)
+*.xlsx
+backups/
+controle-financeiro-*.json
+controle-financeiro-*.csv

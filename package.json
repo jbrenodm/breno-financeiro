@@ -1,0 +1,18 @@
+{
+  "name": "breno-financeiro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Controle Financeiro Pessoal — PWA mobile-first com Google Sheets como fonte de dados",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs 8080",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "check": "node --check app/app.js && node --check app/sheets.js && node --check app/sw.js",
+    "check:formulas": "node scripts/check_formulas.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  },
+  "engines": { "node": ">=20.11" }
+}

@@ -1,0 +1,59 @@
+name: CI e deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run check
+      - run: npm test
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+
+  deploy:
+    # Publica a pasta app/ no GitHub Pages (Settings → Pages → Source: GitHub Actions)
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versão do cache do service worker = commit
+        run: sed -i "s/const CACHE = 'cfp-[^']*'/const CACHE = 'cfp-${GITHUB_SHA::7}'/" app/sw.js
+      - name: Client ID do Google (variável do repositório GOOGLE_CLIENT_ID, opcional)
+        if: vars.GOOGLE_CLIENT_ID != ''
+        run: sed -i "s/^const DEFAULT_CLIENT_ID = '';/const DEFAULT_CLIENT_ID = '${{ vars.GOOGLE_CLIENT_ID }}';/" app/app.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
+      - id: deployment
+        uses: actions/deploy-pages@v4
