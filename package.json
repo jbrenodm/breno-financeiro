@@ -2,6 +2,7 @@
   "name": "breno-financeiro",
   "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "description": "Controle Financeiro Pessoal — PWA mobile-first com Google Sheets como fonte de dados",
   "type": "module",
   "scripts": {

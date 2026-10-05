@@ -118,3 +118,7 @@ tests/      testes Playwright + simulação da Google Sheets API
 scripts/    servidor local e conferência de fórmulas
 docs/       decisões e backlog
 ```
+
+## Licença
+
+[MIT](LICENSE) © 2026 Breno
