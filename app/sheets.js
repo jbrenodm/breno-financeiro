@@ -381,7 +381,11 @@ const Sync = (() => {
         set('ok', `Salvo às ${hhmm()}`);
         return true;
       });
-    } catch (e) { fail(e); return false; }
+    } catch (e) {
+      fail(e);
+      if (e.code === 'auth') toast('Sessão do Google expirou. Toque em Entrar e tente de novo.');
+      return false;
+    }
   }
   async function setMeta(p) {
     if (mode() === 'local') { data.metaPct = p; cache(); return true; }
@@ -389,7 +393,9 @@ const Sync = (() => {
   }
   /** Para chamar dentro de um toque: garante o login (pode abrir o popup do Google). */
   async function login() {
-    try { await GAuth.get(true); return true; } catch (e) { fail(e); return false; }
+    try { await GAuth.get(true); } catch (e) { fail(e); return false; }
+    if (status === 'auth') refresh();
+    return true;
   }
   async function createSheet() {
     return run(async () => {
