@@ -2,6 +2,20 @@
 
 Registro curto do porquê das escolhas. Acrescente novas no topo, com data.
 
+## 2026-10-05 — Repositório e site públicos (GitHub Pages)
+- **Preocupação:** a segurança dos dados financeiros, não a visibilidade do código.
+- **Alternativas consideradas:**
+  - repo privado + GitHub Pro;
+  - Cloudflare Pages com repo privado;
+  - Cloudflare Access (restringir o site por e-mail);
+  - servidor próprio;
+  - app nativo (Capacitor/Electron).
+- **Decisão:** manter público. Os dados nunca estão no código nem no site. Eles ficam na planilha, acessível só a quem
+  (1) faz login no Google com e-mail cadastrado como usuário de teste e (2) tem a planilha compartilhada como Editor.
+- **Consequências:**
+  - o modo Teste do OAuth faz parte da segurança (não migrar para "Em produção");
+  - se um dia for preciso restringir quem abre o app, o caminho mais simples é Cloudflare Pages + Access.
+
 ## 2026-10-05 — Google Sheets como fonte de dados
 - **Contexto:** Breno e Jaqueline precisam ver e editar os mesmos dados. Ela também quer acesso à planilha.
 - **Alternativas consideradas:**

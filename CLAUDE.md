@@ -44,6 +44,18 @@ Os dois scripts são clássicos (sem `type="module"`) e compartilham o escopo gl
 `render()`, `toast()`, etc. ficam em `app.js`, e `Sync`, `GAuth`, `SheetsApi` em `sheets.js`. Mantenha assim, ou migre
 os dois para ES modules de uma vez com aprovação do usuário. Não misture.
 
+## Ambiente configurado (estado atual)
+
+- **Repositório público** `jbrenodm/breno-financeiro`, licença MIT. Deploy pelo GitHub Actions → GitHub Pages
+  (Settings → Pages → Source: GitHub Actions). A variável de repositório `GOOGLE_CLIENT_ID` já está configurada.
+- **Google Cloud:** projeto próprio do app, com a Google Sheets API ativada, OAuth em **modo Teste** e apenas
+  o e-mail do Breno e o da Jaqueline como usuários de teste.
+  Cliente OAuth "Aplicativo da Web" com origens autorizadas `https://jbrenodm.github.io` e `http://localhost:8080`.
+  Trocou a porta do `npm run dev` ou o domínio? A origem nova precisa ser cadastrada no cliente OAuth.
+- **Segurança dos dados:** o código é público de propósito. A proteção dos dados vem de (1) OAuth em modo Teste com
+  usuários de teste e (2) a planilha compartilhada só entre os dois. Nunca sugira publicar o app no modo "Em produção",
+  compartilhar a planilha por link ("qualquer pessoa com o link") nem guardar dados, backups ou tokens no repositório.
+
 ## Modelo de dados (no app)
 
 ```js
