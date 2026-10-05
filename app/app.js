@@ -425,8 +425,8 @@ function barChart(el, c, kind) {
   let min = 0, max;
   if (kind === 'main') max = Math.max(...c.receitas, ...c.despesas);
   else { max = Math.max(0, ...c.saldo); min = Math.min(0, ...c.saldo); }
-  const span = niceMax(Math.max(max, -min, 1));
-  const top = max > 0 || kind === 'main' ? span : 0;
+  const span = niceMax(Math.max(max, -min, 100));
+  const top = min < 0 && max <= 0 ? 0 : span;
   const bot = min < 0 ? -span : 0;
   const y = (val) => T + ih * (top - val) / ((top - bot) || 1);
   let g = '';
