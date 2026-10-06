@@ -66,18 +66,10 @@ const GIS_STUB = `window.google={accounts:{oauth2:{
   initTokenClient:(o)=>({requestAccessToken:()=>setTimeout(()=>o.callback({access_token:'TOKEN',expires_in:3600}),5)}),
   revoke:()=>{}}}}`;
 
-/** Pula a tela de entrada (primeiro uso) em testes que não tratam de login. */
-export async function skipWelcome(page) {
-  await page.addInitScript(() => {
-    if (!localStorage.getItem('cfp:settings:v1')) localStorage.setItem('cfp:settings:v1', JSON.stringify({ localOnly: true }));
-  });
-}
-
 /** Liga uma página ao fake (login Google sempre aceito). */
 export async function attach(page, fake) {
   page.errors = [];
   page.on('pageerror', (e) => page.errors.push(e.message));
-  await skipWelcome(page);
   await page.route('https://accounts.google.com/gsi/client', (r) => r.fulfill({ contentType: 'text/javascript', body: GIS_STUB }));
   await page.route('https://sheets.googleapis.com/**', (r) => fake.handle(r));
   return page;

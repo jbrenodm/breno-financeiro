@@ -2,14 +2,19 @@
 
 Registro curto do porquê das escolhas. Acrescente novas no topo, com data.
 
+## 2026-10-05 — Pendente e Publicado, sem tela de login
+- **Problema:** no Android a renovação silenciosa não funciona ao recarregar. A tela de entrada aparecia a cada abertura e atrapalhava.
+- **Decisão:** remover a tela de entrada. Cada valor digitado fica **Pendente** (campo marcado e contador na aba Mês) até ser gravado na planilha, quando vira **Publicado**. O botão **Publicar** envia tudo; se não houver sessão, pede o login no próprio toque.
+- **Consequência:** nenhuma alteração se perde enquanto a sessão não existe. A sessão continua de 1 hora. Sessão permanente exigiria backend ou app nativo.
+
 ## 2026-10-05 — Estado de sincronização separado da conta Google
 - **Decisão:** o topo mostra só o estado da sincronização (Sincronizando, Sincronizado, Não sincronizado). Entrar e Sair ficam na conta Google: no aviso de sessão expirada e em Ajustes.
 - **Motivo:** antes, o mesmo botão mostrava "Entrar" e servia para sincronizar, o que misturava estado com ação.
 
 ## 2026-10-05 — Entrada com login e renovação silenciosa do acesso
 - **Problema:** o token do Google dura ~1 h e fica só na memória. Ao recarregar, o app pedia "Entrar" de novo.
-- **Decisão:** não guardar o token em `localStorage`. Ao abrir com planilha conectada, o app tenta renovar sem janela (`prompt: 'none'`). Se falhar, mostra a tela de entrada com "Entrar com Google" e "Ver sem sincronizar", que deixa os dados do aparelho visíveis sem sincronizar. Um aviso discreto no topo mantém o botão de entrar disponível.
-- **Primeiro uso** (sem planilha e sem escolha de "só neste aparelho"): tela de entrada com "Entrar com Google" e "Usar só neste aparelho".
+- **Decisão:** não guardar o token em `localStorage`. Ao abrir com planilha conectada, o app tenta renovar sem janela (`prompt: 'none'`). Se falhar, mostra um aviso discreto no topo com "Entrar com Google".
+- **Atualizado:** a tela de entrada inicial foi removida (ver "Pendente e Publicado").
 - **Consequência:** a primeira aba depois de conectar é Gráficos.
 - **Alternativas recusadas:** token em `localStorage` (qualquer script da página teria acesso ao token por até 1 h) e bloquear a tela inteira quando a sessão expira (esconderia dados já sincronizados).
 

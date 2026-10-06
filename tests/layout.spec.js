@@ -1,7 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { skipWelcome } from './fake-sheets.js';
-
-test.beforeEach(async ({ page }) => skipWelcome(page));
 
 test('desktop: menu lateral à esquerda e sem rolagem horizontal em todas as abas', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

@@ -2,6 +2,8 @@
 import { test, expect } from '@playwright/test';
 import { FakeSheets, attach } from './fake-sheets.js';
 
+const OUT = 13; // outubro em Itens
+
 test('sessão expirada avisa, não grava e o login recupera a planilha', async ({ browser }) => {
   const fake = new FakeSheets();
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
@@ -52,17 +54,6 @@ test('ao recarregar, renova o acesso sem janela', async ({ browser }) => {
   await expect(A.locator('[data-tab="graficos"]')).toHaveClass(/active/);
 });
 
-test('primeiro uso mostra a tela de entrada e permite usar sem conta', async ({ browser }) => {
-  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
-  const A = await ctx.newPage();
-  await A.goto('/');
-  await expect(A.locator('#entrada')).toBeVisible();
-  await A.locator('#usarLocal').click();
-  await expect(A.locator('#entrada')).toBeHidden();
-  await A.reload();
-  await expect(A.locator('#entrada')).toBeHidden();
-});
-
 test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browser }) => {
   const fake = new FakeSheets();
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
@@ -84,9 +75,33 @@ test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browse
   await A.reload();
   await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   await expect(A.locator('#authBanner')).toBeVisible();
-  await expect(A.locator('#entrada')).toBeVisible();
-  await A.locator('#verSemSync').click();
-  await expect(A.locator('#entrada')).toBeHidden();
+});
+
+test('alteração sem login fica pendente e Publicar envia após o login', async ({ browser }) => {
+  const fake = new FakeSheets();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
+  const A = await ctx.newPage();
+  await A.clock.setFixedTime(new Date('2026-10-15T12:00:00-03:00'));
+  await attach(A, fake);
+  await A.goto('/');
+  await A.locator('[data-tab="ajustes"]').click();
+  await A.locator('#clientId').fill('cid.apps.googleusercontent.com');
+  await A.locator('#shCreate').click();
+  await expect(A.locator('#sheetStatus')).toHaveText('Planilha criada');
+
+  await A.evaluate(() => GAuth.clear());
+  await A.locator('[data-tab="mes"]').click();
+  await A.locator('[data-key="rec"] .group-head').click();
+  const breno = A.locator('[data-key="rec"] .money').first();
+  await breno.fill('777'); await breno.press('Tab');
+  await expect(A.locator('#pendBar')).toContainText('1 valor pendente');
+  await expect(A.locator('.money.pend')).toHaveCount(1);
+  expect(fake.itens().find((r) => r[3] === 'Breno')[OUT]).toBe(0);
+
+  await A.locator('#publicar').click();
+  await expect(A.locator('#pendBar')).toContainText('Tudo publicado');
+  await expect(A.locator('.money.pend')).toHaveCount(0);
+  expect(fake.itens().find((r) => r[3] === 'Breno')[OUT]).toBe(777);
 });
 
 test('sair da conta Google não renova sozinho ao recarregar', async ({ browser }) => {

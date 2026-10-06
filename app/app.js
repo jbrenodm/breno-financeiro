@@ -106,7 +106,7 @@ let data = (() => {
   return emptyData();
 })();
 let settings = (() => {
-  const base = { clientId: '', sheetId: '', authed: false, localOnly: false, theme: 'auto' };
+  const base = { clientId: '', sheetId: '', authed: false, theme: 'auto' };
   try { return { ...base, ...JSON.parse(safeGet(SETTINGS_KEY) || '{}') }; } catch { return base; }
 })();
 function saveSettings() { safeSet(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -263,6 +263,7 @@ function renderMes(v) {
   const c = calcYear(ui.year);
   v.innerHTML = `
     <section class="card" id="summary"></section>
+    <div class="pend-bar" id="pendBar"></div>
     <h2 class="section-title">Receitas</h2>
     ${groupCard('rec', 'Receitas', c.receitas[m], Y.receitas)}
     <h2 class="section-title">Despesas</h2>
@@ -272,6 +273,7 @@ function renderMes(v) {
     </div>
     <p class="hint">Dica: no valor você pode digitar contas, ex.: <b>120+35,90</b>.</p>`;
   updateMesTotals();
+  refreshPendingUI();
 
   $$('.group-head', v).forEach((h) => h.addEventListener('click', () => {
     const card = h.closest('.group'); const key = card.dataset.key;
@@ -292,6 +294,21 @@ function renderMes(v) {
     inp.addEventListener('blur', () => commitInput(inp));
   });
   $('#copyPrev', v).addEventListener('click', copyPrevMonth);
+}
+/** Pendente = digitado mas ainda não gravado na planilha. Publicado = gravado. */
+function refreshPendingUI() {
+  const bar = $('#pendBar');
+  if (bar) {
+    const n = Sync.mode() === 'sheet' ? Sync.pendingCount : 0;
+    bar.innerHTML = Sync.mode() !== 'sheet' ? '' : n
+      ? `<span>${n} ${n === 1 ? 'valor pendente' : 'valores pendentes'}</span><button class="btn sm primary" id="publicar" type="button">Publicar</button>`
+      : '<span>Tudo publicado</span>';
+  }
+  $$('.money').forEach((inp) => inp.classList.toggle('pend', Sync.isPending(inp.dataset.id, ui.month)));
+}
+async function publicar() {
+  if (!GAuth.valid() && !(await Sync.login())) return;
+  Sync.publish();
 }
 function findItem(id) {
   const Y = data.years[ui.year];
@@ -818,35 +835,18 @@ function applyTheme() {
 }
 
 /* ---------- inicialização ---------- */
-function mostrarEntrada(modo) {
-  const comPlanilha = modo === 'sheet';
-  $('#entradaTexto').textContent = comPlanilha
-    ? 'Entre com sua conta Google para sincronizar a planilha. Os dados deste aparelho continuam salvos.'
-    : 'Entre com sua conta Google para sincronizar a planilha compartilhada com a Jaqueline.';
-  $('#verSemSync').hidden = !comPlanilha;
-  $('#usarLocal').hidden = comPlanilha;
-  $('#entrada').hidden = false;
-}
 applyTheme();
 $$('.tabbar button').forEach((b) => b.addEventListener('click', () => { ui.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
 $('#prevBtn').addEventListener('click', () => step(-1));
 $('#nextBtn').addEventListener('click', () => step(1));
 $('#syncBtn').addEventListener('click', () => Sync.refresh());
 $('#authBtn').addEventListener('click', () => Sync.login());
-$('#usarLocal').addEventListener('click', () => { settings.localOnly = true; saveSettings(); $('#entrada').hidden = true; });
-$('#verSemSync').addEventListener('click', () => { $('#entrada').hidden = true; });
-$('#entrarGoogle').addEventListener('click', async () => {
-  if (!(await Sync.login())) return;
-  $('#entrada').hidden = true;
-  if (Sync.mode() === 'local') { ui.tab = 'ajustes'; render(); toast('Crie ou conecte a planilha em Ajustes'); }
-});
+$('#view').addEventListener('click', (e) => { if (e.target.closest('#publicar')) publicar(); });
+document.addEventListener('cfp:pending', refreshPendingUI);
 readInviteHash();
 if (Sync.mode() === 'sheet') ui.tab = 'graficos';
 render();
-Sync.boot().then((ok) => {
-  if (!ok) mostrarEntrada('sheet');
-  else if (Sync.mode() === 'local' && !settings.localOnly) mostrarEntrada('local');
-});
+Sync.boot();
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

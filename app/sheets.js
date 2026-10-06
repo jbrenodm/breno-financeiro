@@ -308,7 +308,8 @@ const Sync = (() => {
   let status = 'local', message = '', timer = null, chain = Promise.resolve(), busy = 0, needsRender = false;
   let pending = (() => { try { return JSON.parse(safeGet(PENDING_KEY) || '[]'); } catch { return []; } })();
   const mode = () => (settings.sheetId ? 'sheet' : 'local');
-  const savePending = () => safeSet(PENDING_KEY, JSON.stringify(pending));
+  const savePending = () => { safeSet(PENDING_KEY, JSON.stringify(pending)); document.dispatchEvent(new Event('cfp:pending')); };
+  const isPending = (id, m) => pending.some((p) => p.id === id && p.m === m);
   const cache = () => safeSet(STORAGE_KEY, JSON.stringify(data));
   const hhmm = () => new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   function set(s, m = '') { status = s; message = m; paint(); }
@@ -441,11 +442,15 @@ const Sync = (() => {
     const banner = $('#authBanner'); if (banner) banner.hidden = status !== 'auth' || mode() === 'local';
     const line = $('#sheetStatus'); if (line) line.textContent = message || (mode() === 'sheet' ? 'Conectado' : 'Dados só neste aparelho');
   }
+  /** Envia os pendentes. Chamar dentro de um toque: pede o login antes, se preciso. */
+  function publish() {
+    return run(async () => { set('pending', 'Publicando…'); await flushNow(); set('ok', `Publicado às ${hhmm()}`); }).catch(fail);
+  }
   function boot() {
     setInterval(() => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid() && !busy) refresh(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid()) refresh(); });
-    if (mode() === 'local') { set('local'); return Promise.resolve(true); }
-    return GAuth.silent().then((ok) => { if (ok) refresh(); else fail(authErr()); return ok; });
+    if (mode() === 'local') set('local');
+    else GAuth.silent().then((ok) => { if (ok) refresh(); else fail(authErr()); });
   }
-  return { setValue, refresh, mutate, setMeta, login, logout, createSheet, linkSheet, disconnect, paint, boot, mode, get pendingCount() { return pending.length; } };
+  return { setValue, refresh, publish, mutate, setMeta, login, logout, createSheet, linkSheet, disconnect, paint, boot, mode, isPending, get pendingCount() { return pending.length; } };
 })();
