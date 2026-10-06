@@ -28,10 +28,10 @@ test('sessão expirada avisa, não grava e o login recupera a planilha', async (
   await A.locator('#dialog input').fill('Teste');
   await A.locator('#dialog button', { hasText: 'Salvar' }).click();
   await expect(A.locator('#toast')).toHaveText(/Sessão do Google expirou/);
-  await expect(A.locator('#syncLabel')).toHaveText('Entrar');
+  await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   expect(fake.itens().some((r) => r[3] === 'Teste')).toBe(false);
 
-  await A.locator('#syncBtn').click();
+  await A.locator('#authBtn').click();
   await expect(A.locator('#syncLabel')).toHaveText('Sincronizado');
 });
 
@@ -82,6 +82,27 @@ test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browse
       revoke:()=>{}}}}`,
   }));
   await A.reload();
-  await expect(A.locator('#syncLabel')).toHaveText('Entrar');
+  await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   await expect(A.locator('#authBanner')).toBeVisible();
+});
+
+test('sair da conta Google não renova sozinho ao recarregar', async ({ browser }) => {
+  const fake = new FakeSheets();
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
+  const A = await ctx.newPage();
+  await attach(A, fake);
+  await A.goto('/');
+  await A.locator('[data-tab="ajustes"]').click();
+  await A.locator('#clientId').fill('cid.apps.googleusercontent.com');
+  await A.locator('#shCreate').click();
+  await expect(A.locator('#sheetStatus')).toHaveText('Planilha criada');
+
+  await A.locator('#shAuth').click();
+  await A.locator('#dialog button', { hasText: 'Sair' }).click();
+  await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
+  await expect(A.locator('#authBanner')).toBeVisible();
+  await expect(A.locator('#shAuth')).toHaveText('Entrar com Google');
+
+  await A.reload();
+  await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
 });

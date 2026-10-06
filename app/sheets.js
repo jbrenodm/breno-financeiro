@@ -427,6 +427,7 @@ const Sync = (() => {
     });
   }
   function disconnect() { settings.sheetId = ''; saveSettings(); pending = []; savePending(); GAuth.revoke(); set('local'); }
+  function logout() { GAuth.revoke(); set('auth', 'Conta Google desconectada. Entre para sincronizar.'); }
   function paint() {
     const btn = $('#syncBtn'); if (!btn) return;
     btn.hidden = mode() === 'local';
@@ -435,7 +436,7 @@ const Sync = (() => {
     if (st === 'busy' || st === 'pending') btn.classList.add('busy');
     if (st === 'ok') btn.classList.add('ok');
     if (st === 'error' || st === 'auth' || st === 'offline') btn.classList.add('warn');
-    $('#syncLabel').textContent = { busy: 'Sincronizando', pending: 'Enviando', ok: 'Sincronizado', auth: 'Entrar', offline: 'Offline', error: 'Erro' }[st] || 'Planilha';
+    $('#syncLabel').textContent = { busy: 'Sincronizando', pending: 'Sincronizando', ok: 'Sincronizado', auth: 'Não sincronizado', offline: 'Não sincronizado', error: 'Não sincronizado' }[st] || 'Planilha';
     btn.title = message;
     const banner = $('#authBanner'); if (banner) banner.hidden = status !== 'auth' || mode() === 'local';
     const line = $('#sheetStatus'); if (line) line.textContent = message || (mode() === 'sheet' ? 'Conectado' : 'Dados só neste aparelho');
@@ -446,5 +447,5 @@ const Sync = (() => {
     if (mode() === 'local') set('local');
     else GAuth.silent().then((ok) => (ok ? refresh() : fail(authErr())));
   }
-  return { setValue, refresh, mutate, setMeta, login, createSheet, linkSheet, disconnect, paint, boot, mode, get pendingCount() { return pending.length; } };
+  return { setValue, refresh, mutate, setMeta, login, logout, createSheet, linkSheet, disconnect, paint, boot, mode, get pendingCount() { return pending.length; } };
 })();

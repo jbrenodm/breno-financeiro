@@ -41,8 +41,8 @@ test('criar planilha, convidar e editar em dois aparelhos', async ({ browser }) 
   const invite = await A.evaluate(() => `${location.pathname}#planilha=${settings.sheetId}&client=${encodeURIComponent(GAuth.clientId())}`);
   const B = await newUser();
   await B.goto(invite);
-  await expect(B.locator('#syncLabel')).toHaveText('Entrar');
-  await B.locator('#syncBtn').click();
+  await expect(B.locator('#syncLabel')).toHaveText('Não sincronizado');
+  await B.locator('#authBtn').click();
   await expect(B.locator('#syncLabel')).toHaveText('Sincronizado');
   await expect(B.locator('[data-tab="graficos"]')).toHaveClass(/active/);
   await B.locator('[data-tab="mes"]').click();
@@ -82,7 +82,7 @@ test('criar planilha, convidar e editar em dois aparelhos', async ({ browser }) 
   await A.locator('[data-tab="mes"]').click();
   const breno = A.locator('[data-key="rec"] .money').first();
   await breno.fill('9999'); await breno.press('Tab');
-  await expect(A.locator('#syncLabel')).toHaveText('Offline');
+  await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   fake.offline = false;
   await A.locator('#syncBtn').click();
   await expect.poll(() => row('Breno')[OUT]).toBe(9999);

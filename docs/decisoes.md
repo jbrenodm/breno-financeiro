@@ -2,6 +2,10 @@
 
 Registro curto do porquê das escolhas. Acrescente novas no topo, com data.
 
+## 2026-10-05 — Estado de sincronização separado da conta Google
+- **Decisão:** o topo mostra só o estado da sincronização (Sincronizando, Sincronizado, Não sincronizado). Entrar e Sair ficam na conta Google: no aviso de sessão expirada e em Ajustes.
+- **Motivo:** antes, o mesmo botão mostrava "Entrar" e servia para sincronizar, o que misturava estado com ação.
+
 ## 2026-10-05 — Entrada com login e renovação silenciosa do acesso
 - **Problema:** o token do Google dura ~1 h e fica só na memória. Ao recarregar, o app pedia "Entrar" de novo.
 - **Decisão:** não guardar o token em `localStorage`. Ao abrir com planilha conectada, o app tenta renovar sem janela (`prompt: 'none'`). Se falhar, mostra um aviso no topo com botão "Entrar com Google" e mantém os dados do aparelho visíveis.

@@ -739,11 +739,17 @@ function renderSheetCard() {
         <a class="btn sm" href="${sheetUrl(settings.sheetId)}" target="_blank" rel="noopener">Abrir planilha</a>
         <button class="btn sm primary" id="shRefresh" type="button">Atualizar agora</button>
         <button class="btn sm" id="shInvite" type="button">Enviar convite</button>
+        <button class="btn sm ${settings.authed ? '' : 'primary'}" id="shAuth" type="button">${settings.authed ? 'Sair da conta Google' : 'Entrar com Google'}</button>
         <button class="btn sm danger" id="shOff" type="button">Desconectar</button>
       </div>
       <div class="status-line" id="sheetStatus"></div>`;
-    $('#shRefresh', el).addEventListener('click', async () => { if (await Sync.login()) Sync.refresh(); });
+    $('#shRefresh', el).addEventListener('click', () => Sync.refresh());
     $('#shInvite', el).addEventListener('click', invite);
+    $('#shAuth', el).addEventListener('click', async () => {
+      if (!settings.authed) { if (await Sync.login()) Sync.refresh(); return; }
+      if (!(await confirmDlg('Sair da conta Google?', 'A planilha continua conectada. Para sincronizar de novo, entre com Google.', 'Sair'))) return;
+      Sync.logout(); render();
+    });
     $('#shOff', el).addEventListener('click', async () => {
       if (!(await confirmDlg('Desconectar da planilha?', 'A planilha continua no seu Drive. Este aparelho passa a guardar os dados só localmente.', 'Desconectar'))) return;
       Sync.disconnect(); render();
@@ -816,7 +822,7 @@ applyTheme();
 $$('.tabbar button').forEach((b) => b.addEventListener('click', () => { ui.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
 $('#prevBtn').addEventListener('click', () => step(-1));
 $('#nextBtn').addEventListener('click', () => step(1));
-$('#syncBtn').addEventListener('click', async () => { if (await Sync.login()) Sync.refresh(); });
+$('#syncBtn').addEventListener('click', () => Sync.refresh());
 $('#authBtn').addEventListener('click', () => Sync.login());
 $('#usarLocal').addEventListener('click', () => { settings.localOnly = true; saveSettings(); $('#entrada').hidden = true; });
 $('#entrarGoogle').addEventListener('click', async () => {
