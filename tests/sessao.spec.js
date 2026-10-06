@@ -49,6 +49,18 @@ test('ao recarregar, renova o acesso sem janela', async ({ browser }) => {
 
   await A.reload();
   await expect(A.locator('#syncLabel')).toHaveText('Sincronizado');
+  await expect(A.locator('[data-tab="graficos"]')).toHaveClass(/active/);
+});
+
+test('primeiro uso mostra a tela de entrada e permite usar sem conta', async ({ browser }) => {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'pt-BR', serviceWorkers: 'block' });
+  const A = await ctx.newPage();
+  await A.goto('/');
+  await expect(A.locator('#entrada')).toBeVisible();
+  await A.locator('#usarLocal').click();
+  await expect(A.locator('#entrada')).toBeHidden();
+  await A.reload();
+  await expect(A.locator('#entrada')).toBeHidden();
 });
 
 test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browser }) => {
@@ -71,4 +83,5 @@ test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browse
   }));
   await A.reload();
   await expect(A.locator('#syncLabel')).toHaveText('Entrar');
+  await expect(A.locator('#authBanner')).toBeVisible();
 });

@@ -44,6 +44,8 @@ test('criar planilha, convidar e editar em dois aparelhos', async ({ browser }) 
   await expect(B.locator('#syncLabel')).toHaveText('Entrar');
   await B.locator('#syncBtn').click();
   await expect(B.locator('#syncLabel')).toHaveText('Sincronizado');
+  await expect(B.locator('[data-tab="graficos"]')).toHaveClass(/active/);
+  await B.locator('[data-tab="mes"]').click();
   await expect(B.locator('#summary .value').first()).toHaveText(/12\.500,50/);
 
   // --- B muda a estrutura (novo item no meio); A, com dados antigos, lança em item posterior → célula certa

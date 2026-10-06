@@ -261,6 +261,21 @@ dialog .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; paddin
   .stats { grid-template-columns: repeat(4, 1fr); }
 }
 a.btn { text-decoration: none; color: inherit; }
+.stats.two { grid-template-columns: 1fr 1fr; }
+.auth-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  padding: 8px 16px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2);
+}
+.entrada {
+  position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px;
+  background: var(--bg);
+}
+.entrada-card {
+  width: min(360px, 100%); display: flex; flex-direction: column; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px;
+}
+.entrada-card h1 { margin: 0; font-size: 20px; }
+.entrada-card p { margin: 0 0 6px; color: var(--text-2); font-size: 14px; }
 
 @media (min-width: 900px) {
   body { padding-left: 220px; padding-bottom: 24px; }

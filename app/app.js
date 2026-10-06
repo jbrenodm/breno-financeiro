@@ -106,7 +106,7 @@ let data = (() => {
   return emptyData();
 })();
 let settings = (() => {
-  const base = { clientId: '', sheetId: '', authed: false, theme: 'auto' };
+  const base = { clientId: '', sheetId: '', authed: false, localOnly: false, theme: 'auto' };
   try { return { ...base, ...JSON.parse(safeGet(SETTINGS_KEY) || '{}') }; } catch { return base; }
 })();
 function saveSettings() { safeSet(SETTINGS_KEY, JSON.stringify(settings)); }
@@ -405,6 +405,12 @@ function renderGraficos(v) {
   const maxG = Math.max(1, ...totAno.map((t) => t.v));
   const hasData = monthsWithData(c) > 0;
   v.innerHTML = `
+    <section class="card">
+      <div class="stats two">
+        <div class="stat"><div class="label"><i class="dot" style="background:var(--s-rec)"></i>Receitas do ano</div><div class="value">${fmt(sum(c.receitas))}</div></div>
+        <div class="stat"><div class="label"><i class="dot" style="background:var(--s-desp)"></i>Despesas do ano</div><div class="value">${fmt(sum(c.despesas))}</div></div>
+      </div>
+    </section>
     <div class="g-bloco">
       <h2 class="section-title">Receitas × Despesas e Investimentos</h2>
       <section class="card">
@@ -413,8 +419,11 @@ function renderGraficos(v) {
       </section>
     </div>
     <div class="g-bloco">
-      <h2 class="section-title">Saldo mensal (Receitas − Despesas)</h2>
-      <section class="card"><div class="chart" id="ch2"></div></section>
+      <h2 class="section-title">Receitas, despesas e investimentos por mês</h2>
+      <section class="card">
+        <div class="legend"><span><i style="background:var(--s-rec)"></i>Receitas</span><span><i style="background:var(--s-desp)"></i>Gasto real</span><span><i style="background:var(--s-inv)"></i>Investimentos</span></div>
+        <div class="chart" id="ch2"></div>
+      </section>
     </div>
     <div class="g-bloco">
       <h2 class="section-title">Despesas por grupo em ${ui.year}</h2>
@@ -422,21 +431,17 @@ function renderGraficos(v) {
         ${hasData ? `<div class="hbar">${totAno.map((t) => `<span>${esc(t.nome)}</span><span class="num">${fmt(t.v)}</span><div class="bar ${t.inv ? 'inv' : ''}"><span style="width:${(t.v / maxG) * 100}%"></span></div>`).join('')}</div>` : '<div class="empty">Sem lançamentos neste ano.</div>'}
       </section>
     </div>`;
-  barChart($('#ch1', v), c, 'main');
-  barChart($('#ch2', v), c, 'saldo');
+  barChart($('#ch1', v), c);
+  stackedChart($('#ch2', v), c);
 }
-function barChart(el, c, kind) {
+function barChart(el, c) {
   const W = 360, H = 200, L = 40, R = 6, T = 8, B = 22;
   const iw = W - L - R, ih = H - T - B, bw = iw / 12;
-  let min = 0, max;
-  if (kind === 'main') max = Math.max(...c.receitas, ...c.despesas);
-  else { max = Math.max(0, ...c.saldo); min = Math.min(0, ...c.saldo); }
-  const span = niceMax(Math.max(max, -min, 100));
-  const top = min < 0 && max <= 0 ? 0 : span;
-  const bot = min < 0 ? -span : 0;
-  const y = (val) => T + ih * (top - val) / ((top - bot) || 1);
+  const max = Math.max(...c.receitas, ...c.despesas);
+  const span = niceMax(Math.max(max, 100));
+  const y = (val) => T + ih * (1 - val / span);
   let g = '';
-  const ticks = bot < 0 && top > 0 ? [top, top / 2, 0, bot / 2, bot] : bot < 0 ? [0, bot / 2, bot] : [top, top * 0.75, top / 2, top / 4, 0];
+  const ticks = [span, span * 0.75, span * 0.5, span * 0.25, 0];
   ticks.forEach((t) => { g += `<line class="${t === 0 ? 'axis' : 'gridline'}" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${fmtShort(t)}</text>`; });
   const bar = (x, y1, y2, w, color, roundTop = true) => {
     const h = Math.abs(y2 - y1); if (h < 0.5) return '';
@@ -447,7 +452,7 @@ function barChart(el, c, kind) {
   };
   for (let m = 0; m < 12; m++) {
     const x0 = L + m * bw;
-    if (kind === 'main') {
+    {
       const w = Math.min(10, bw * 0.34), gap = 2;
       const xa = x0 + bw / 2 - w - gap / 2, xb = x0 + bw / 2 + gap / 2;
       g += bar(xa, y(0), y(c.receitas[m]), w, 'var(--s-rec)');
@@ -458,22 +463,42 @@ function barChart(el, c, kind) {
         if (y(gr) - y(gr + inv) > 2.5) g += bar(xb, y(gr) - 2, y(gr + inv), w, 'var(--s-inv)');
       } else if (gr > 0) g += bar(xb, y(0), y(gr), w, 'var(--s-desp)');
       else if (inv > 0) g += bar(xb, y(0), y(inv), w, 'var(--s-inv)');
-    } else {
-      const s = c.saldo[m], w = Math.min(16, bw * 0.55);
-      g += bar(x0 + (bw - w) / 2, y(0), y(s), w, s >= 0 ? 'var(--pos)' : 'var(--neg)', s >= 0);
     }
     g += `<text x="${x0 + bw / 2}" y="${H - 6}" text-anchor="middle">${MES_ABREV[m]}</text>`;
     g += `<rect class="hit" data-m="${m}" x="${x0}" y="${T}" width="${bw}" height="${ih}" rx="4"/>`;
   }
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${kind === 'main' ? 'Receitas, gasto real e investimentos por mês' : 'Saldo por mês'}">${g}</svg><div class="tip"></div>`;
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Receitas, gasto real e investimentos por mês">${g}</svg><div class="tip"></div>`;
+  wireTip(el, (m) => [['Receitas', c.receitas[m]], ['Gasto real', c.gastoReal[m]], ['Investimentos', c.invest[m]], ['Despesas (total)', c.despesas[m]]]);
+}
+function stackedChart(el, c) {
+  const W = 360, H = 240, L = 40, R = 6, T = 8, B = 22;
+  const iw = W - L - R, ih = H - T - B, bw = iw / 12;
+  const span = niceMax(Math.max(100, ...c.receitas.map((r, m) => c.despesas[m] + Math.max(0, r))));
+  const y = (val) => T + ih * (1 - val / span);
+  let g = '';
+  [span, span * 0.75, span * 0.5, span * 0.25, 0].forEach((t) => {
+    g += `<line class="${t === 0 ? 'axis' : 'gridline'}" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text x="${L - 6}" y="${y(t) + 4}" text-anchor="end">${fmtShort(t)}</text>`;
+  });
+  for (let m = 0; m < 12; m++) {
+    const x0 = L + m * bw, w = Math.min(18, bw * 0.7), x = x0 + (bw - w) / 2;
+    let base = 0;
+    [[c.invest[m], 'var(--s-inv)'], [c.gastoReal[m], 'var(--s-desp)'], [Math.max(0, c.receitas[m]), 'var(--s-rec)']].forEach(([v, color]) => {
+      if (v <= 0) return;
+      g += `<rect x="${x}" y="${y(base + v)}" width="${w}" height="${y(base) - y(base + v)}" rx="2" fill="${color}"/>`;
+      base += v;
+    });
+    g += `<text x="${x0 + bw / 2}" y="${H - 6}" text-anchor="middle">${MES_ABREV[m]}</text>`;
+    g += `<rect class="hit" data-m="${m}" x="${x0}" y="${T}" width="${bw}" height="${ih}" rx="4"/>`;
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Receitas, despesas e investimentos empilhados por mês">${g}</svg><div class="tip"></div>`;
+  wireTip(el, (m) => [['Receitas', c.receitas[m]], ['Gasto real', c.gastoReal[m]], ['Investimentos', c.invest[m]], ['Despesas (total)', c.despesas[m]]]);
+}
+function wireTip(el, rowsFor) {
   const tip = $('.tip', el);
   const show = (rect) => {
     const m = +rect.dataset.m;
     $$('.hit', el).forEach((h) => h.classList.toggle('on', h === rect));
-    const rows = kind === 'main'
-      ? [['Receitas', c.receitas[m]], ['Gasto real', c.gastoReal[m]], ['Investimentos', c.invest[m]], ['Despesas (total)', c.despesas[m]]]
-      : [['Receitas', c.receitas[m]], ['Despesas', c.despesas[m]], ['Saldo', c.saldo[m]]];
-    tip.innerHTML = `<b>${MESES[m]}</b>${rows.map(([k, val]) => `<div><span>${k}</span><span>${fmt(val)}</span></div>`).join('')}`;
+    tip.innerHTML = `<b>${MESES[m]}</b>${rowsFor(m).map(([k, val]) => `<div><span>${k}</span><span>${fmt(val)}</span></div>`).join('')}`;
     const box = el.getBoundingClientRect(), rb = rect.getBoundingClientRect();
     let left = rb.left - box.left + rb.width / 2 - 85;
     left = Math.max(4, Math.min(left, box.width - 174));
@@ -791,7 +816,16 @@ $$('.tabbar button').forEach((b) => b.addEventListener('click', () => { ui.tab =
 $('#prevBtn').addEventListener('click', () => step(-1));
 $('#nextBtn').addEventListener('click', () => step(1));
 $('#syncBtn').addEventListener('click', async () => { if (await Sync.login()) Sync.refresh(); });
+$('#authBtn').addEventListener('click', () => Sync.login());
+$('#usarLocal').addEventListener('click', () => { settings.localOnly = true; saveSettings(); $('#entrada').hidden = true; });
+$('#entrarGoogle').addEventListener('click', async () => {
+  if (!(await Sync.login())) return;
+  $('#entrada').hidden = true; ui.tab = 'ajustes'; render();
+  toast('Crie ou conecte a planilha em Ajustes');
+});
 readInviteHash();
+if (Sync.mode() === 'sheet') ui.tab = 'graficos';
+$('#entrada').hidden = Sync.mode() === 'sheet' || settings.localOnly;
 render();
 Sync.boot();
 

@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-10-15T12:00:00-03:00'));
   await page.goto('/');
-  await page.evaluate(() => localStorage.clear());
+  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('cfp:settings:v1', JSON.stringify({ localOnly: true })); });
   await page.reload();
 });
 

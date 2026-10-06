@@ -68,9 +68,10 @@ O cache do service worker é renovado automaticamente a cada deploy.
 
 ## 3. Primeiro uso (você)
 
-1. Abra o app → **Ajustes → Planilha do Google Sheets** → cole o Client ID.
-2. Toque em **Criar planilha no Google Sheets** e autorize com sua conta Google.
-3. A planilha *Controle Financeiro Pessoal* aparece no seu Drive. Abra-a uma vez e confira se o Resumo não tem `#ERROR`.
+1. Abra o app e toque em **Entrar com Google** na tela inicial (ou em **Usar só neste aparelho**, se não quiser planilha).
+2. Em **Ajustes → Planilha do Google Sheets**, cole o Client ID.
+3. Toque em **Criar planilha no Google Sheets** e autorize com sua conta Google.
+4. A planilha *Controle Financeiro Pessoal* aparece no seu Drive. Abra-a uma vez e confira se o Resumo não tem `#ERROR`.
 
 ## 4. Dar acesso à Jaqueline
 

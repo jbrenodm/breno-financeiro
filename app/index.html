@@ -28,6 +28,10 @@
     <button type="button" class="icon-btn" id="nextBtn" aria-label="Próximo mês">›</button>
   </div>
 </header>
+<div id="authBanner" class="auth-banner" hidden>
+  <span>Sincronização pausada. Os dados deste aparelho continuam aqui.</span>
+  <button class="btn sm primary" id="authBtn" type="button">Entrar com Google</button>
+</div>
 
 <main id="view" tabindex="-1"></main>
 
@@ -45,6 +49,15 @@
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     <span>Ajustes</span></button>
 </nav>
+
+<section id="entrada" class="entrada" hidden>
+  <div class="entrada-card">
+    <h1>Controle Financeiro</h1>
+    <p>Entre com sua conta Google para sincronizar a planilha compartilhada com a Jaqueline.</p>
+    <button class="btn block primary" id="entrarGoogle" type="button">Entrar com Google</button>
+    <button class="btn block" id="usarLocal" type="button">Usar só neste aparelho</button>
+  </div>
+</section>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <dialog id="dialog"><form method="dialog" id="dialogForm"></form></dialog>

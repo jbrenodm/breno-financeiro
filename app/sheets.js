@@ -437,6 +437,7 @@ const Sync = (() => {
     if (st === 'error' || st === 'auth' || st === 'offline') btn.classList.add('warn');
     $('#syncLabel').textContent = { busy: 'Sincronizando', pending: 'Enviando', ok: 'Sincronizado', auth: 'Entrar', offline: 'Offline', error: 'Erro' }[st] || 'Planilha';
     btn.title = message;
+    const banner = $('#authBanner'); if (banner) banner.hidden = status !== 'auth' || mode() === 'local';
     const line = $('#sheetStatus'); if (line) line.textContent = message || (mode() === 'sheet' ? 'Conectado' : 'Dados só neste aparelho');
   }
   function boot() {
