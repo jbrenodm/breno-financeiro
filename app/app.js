@@ -421,7 +421,7 @@ function renderGraficos(v) {
     <div class="g-bloco">
       <h2 class="section-title">Receitas, despesas e investimentos por mês</h2>
       <section class="card">
-        <div class="legend"><span><i style="background:var(--s-rec)"></i>Receitas</span><span><i style="background:var(--s-desp)"></i>Gasto real</span><span><i style="background:var(--s-inv)"></i>Investimentos</span></div>
+        <div class="legend"><span><i style="background:var(--s-rec)"></i>Sobra de receita</span><span><i style="background:var(--s-desp)"></i>Gasto real</span><span><i style="background:var(--s-inv)"></i>Investimentos</span></div>
         <div class="chart" id="ch2"></div>
       </section>
     </div>
@@ -473,7 +473,7 @@ function barChart(el, c) {
 function stackedChart(el, c) {
   const W = 360, H = 240, L = 40, R = 6, T = 8, B = 22;
   const iw = W - L - R, ih = H - T - B, bw = iw / 12;
-  const span = niceMax(Math.max(100, ...c.receitas.map((r, m) => c.despesas[m] + Math.max(0, r))));
+  const span = niceMax(Math.max(100, ...c.receitas.map((r, m) => Math.max(r, c.despesas[m]))));
   const y = (val) => T + ih * (1 - val / span);
   let g = '';
   [span, span * 0.75, span * 0.5, span * 0.25, 0].forEach((t) => {
@@ -482,7 +482,8 @@ function stackedChart(el, c) {
   for (let m = 0; m < 12; m++) {
     const x0 = L + m * bw, w = Math.min(18, bw * 0.7), x = x0 + (bw - w) / 2;
     let base = 0;
-    [[c.invest[m], 'var(--s-inv)'], [c.gastoReal[m], 'var(--s-desp)'], [Math.max(0, c.receitas[m]), 'var(--s-rec)']].forEach(([v, color]) => {
+    const sobra = Math.max(0, c.receitas[m] - c.despesas[m]);
+    [[c.invest[m], 'var(--s-inv)'], [c.gastoReal[m], 'var(--s-desp)'], [sobra, 'var(--s-rec)']].forEach(([v, color]) => {
       if (v <= 0) return;
       g += `<rect x="${x}" y="${y(base + v)}" width="${w}" height="${y(base) - y(base + v)}" rx="2" fill="${color}"/>`;
       base += v;
@@ -491,7 +492,7 @@ function stackedChart(el, c) {
     g += `<rect class="hit" data-m="${m}" x="${x0}" y="${T}" width="${bw}" height="${ih}" rx="4"/>`;
   }
   el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Receitas, despesas e investimentos empilhados por mês">${g}</svg><div class="tip"></div>`;
-  wireTip(el, (m) => [['Receitas', c.receitas[m]], ['Gasto real', c.gastoReal[m]], ['Investimentos', c.invest[m]], ['Despesas (total)', c.despesas[m]]]);
+  wireTip(el, (m) => [['Receitas', c.receitas[m]], ['Gasto real', c.gastoReal[m]], ['Investimentos', c.invest[m]], ['Despesas (total)', c.despesas[m]], ['Sobra', Math.max(0, c.receitas[m] - c.despesas[m])]]);
 }
 function wireTip(el, rowsFor) {
   const tip = $('.tip', el);
