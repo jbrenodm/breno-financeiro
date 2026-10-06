@@ -104,7 +104,7 @@ Regras:
    A `fn` só pode usar o objeto recebido e IDs, nunca objetos antigos de `data`. Retorne `false` para cancelar.
 3. `writeAll` **grava primeiro e só depois limpa as sobras**. Nunca inverta a ordem: outra pessoa poderia ler a planilha vazia.
 4. Todas as chamadas passam por `run()` (fila serial). Não faça chamadas à API fora dela.
-5. Login: o token dura ~1 h e só pode ser pedido **dentro de um toque do usuário** (popup). Ao abrir, `GAuth.silent()` tenta renovar com `prompt: 'none'`; se falhar, aparece o aviso do topo com "Entrar com Google". "Sair" (`Sync.logout`) revoga o acesso e desliga a renovação automática.
+5. Login: o token dura ~1 h e só pode ser pedido **dentro de um toque do usuário** (popup). Ao abrir, `GAuth.silent()` tenta renovar com `prompt: 'none'`; se falhar, o topo mostra "Não sincronizado" e o login fica em Ajustes e no botão Publicar. "Sair" (`Sync.logout`) revoga o acesso e desliga a renovação automática.
    Em handlers de clique, chame `await needAuth()` **antes** de qualquer `await dialog(...)`. Depois de um await, o navegador bloqueia o popup.
 6. Pendente/Publicado: valores ficam em `pending` até a planilha confirmar. `savePending()` dispara o evento `cfp:pending`, que atualiza a barra e as marcações da aba Mês. `Sync.publish()` envia tudo (no toque em "Publicar", o login é pedido antes, se preciso). Estrutura exige conexão (mostra erro e não altera nada).
 7. `renderSafe()` não re-renderiza enquanto um campo `.money` está em foco.

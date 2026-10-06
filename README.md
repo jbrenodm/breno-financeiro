@@ -77,7 +77,7 @@ O cache do service worker é renovado automaticamente a cada deploy.
 
 1. Abra a planilha → **Compartilhar** → e-mail dela → **Editor**.
 2. No app: **Ajustes → Enviar convite**. Isso manda um link do app que já leva o endereço da planilha e o Client ID.
-3. Ela abre o link, toca em **Entrar com Google** no aviso do topo (ou em Ajustes) e autoriza com a conta dela.
+3. Ela abre o link, toca em **Entrar com Google** em Ajustes e autoriza com a conta dela.
 
 ## Como a sincronização funciona
 
@@ -86,7 +86,7 @@ O cache do service worker é renovado automaticamente a cada deploy.
 - O app busca novidades ao voltar para ele e a cada 1 minuto com a tela aberta.
 - Um valor digitado fica **Pendente** (campo marcado e contador na aba Mês) até ser gravado na planilha. Depois vira **Publicado**. Se não houver sessão, o botão **Publicar** pede o login e envia tudo.
 - **Sem internet**, os valores pendentes ficam guardados no aparelho e são enviados depois. Mudanças de estrutura precisam de internet.
-- O acesso do Google dura ~1 hora. Depois disso o topo mostra **Não sincronizado** e um aviso com **Entrar com Google**: um toque renova o acesso.
+- O acesso do Google dura ~1 hora. Depois disso o topo mostra **Não sincronizado**. Para renovar, toque em **Entrar com Google** em Ajustes ou em **Publicar**.
 
 ## Problemas comuns
 

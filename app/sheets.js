@@ -439,7 +439,7 @@ const Sync = (() => {
     if (st === 'error' || st === 'auth' || st === 'offline') btn.classList.add('warn');
     $('#syncLabel').textContent = { busy: 'Sincronizando', pending: 'Sincronizando', ok: 'Sincronizado', auth: 'Não sincronizado', offline: 'Não sincronizado', error: 'Não sincronizado' }[st] || 'Planilha';
     btn.title = message;
-    const banner = $('#authBanner'); if (banner) banner.hidden = status !== 'auth' || mode() === 'local';
+    const authBtn = $('#shAuth'); if (authBtn) authBtn.textContent = GAuth.valid() ? 'Sair da conta Google' : 'Entrar com Google';
     const line = $('#sheetStatus'); if (line) line.textContent = message || (mode() === 'sheet' ? 'Conectado' : 'Dados só neste aparelho');
   }
   /** Envia os pendentes. Chamar dentro de um toque: pede o login antes, se preciso. */

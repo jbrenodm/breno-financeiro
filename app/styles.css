@@ -262,10 +262,6 @@ dialog .dlg-actions { display: flex; gap: 8px; justify-content: flex-end; paddin
 }
 a.btn { text-decoration: none; color: inherit; }
 .stats.two { grid-template-columns: 1fr 1fr; }
-.auth-banner {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-  padding: 8px 16px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2);
-}
 .pend-bar {
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);

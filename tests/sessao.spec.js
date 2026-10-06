@@ -33,7 +33,7 @@ test('sessão expirada avisa, não grava e o login recupera a planilha', async (
   await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   expect(fake.itens().some((r) => r[3] === 'Teste')).toBe(false);
 
-  await A.locator('#authBtn').click();
+  await A.locator('#shAuth').click();
   await expect(A.locator('#syncLabel')).toHaveText('Sincronizado');
 });
 
@@ -74,7 +74,6 @@ test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browse
   }));
   await A.reload();
   await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
-  await expect(A.locator('#authBanner')).toBeVisible();
 });
 
 test('alteração sem login fica pendente e Publicar envia após o login', async ({ browser }) => {
@@ -118,7 +117,6 @@ test('sair da conta Google não renova sozinho ao recarregar', async ({ browser 
   await A.locator('#shAuth').click();
   await A.locator('#dialog button', { hasText: 'Sair' }).click();
   await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
-  await expect(A.locator('#authBanner')).toBeVisible();
   await expect(A.locator('#shAuth')).toHaveText('Entrar com Google');
 
   await A.reload();
