@@ -272,8 +272,10 @@ a.btn { text-decoration: none; color: inherit; }
   main#view > * { grid-column: 1 / -1; }
   main#view > .group { grid-column: auto; }
   main#view > .group[data-key="rec"] { grid-column: 1 / -1; }
-  main#view:has(> .g-bloco) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  main#view > .g-bloco { grid-column: auto; }
+  main#view:has(> .g-bloco) { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+  main#view > .g-bloco { grid-column: auto; display: flex; flex-direction: column; }
+  .g-bloco > .card { flex: 1; display: flex; flex-direction: column; }
+  .g-bloco .chart { flex: 1; display: flex; flex-direction: column; justify-content: center; }
   main#view > .g-bloco:last-child { grid-column: 1 / -1; }
   .tabbar {
     position: fixed; top: 0; bottom: 0; left: 0; right: auto; width: 220px;
