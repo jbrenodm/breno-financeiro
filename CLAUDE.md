@@ -17,7 +17,7 @@ individuais com data: essa foi uma escolha do usuário.
 ## Stack e restrições
 
 - **HTML + CSS + JavaScript puro, sem build, sem framework, sem dependências em runtime.** Não adicione React, Vue,
-  bundler, TypeScript nem bibliotecas de UI ou gráficos sem o usuário pedir. Gráficos são SVG feitos à mão (`barChart` em `app.js`).
+  bundler, TypeScript nem bibliotecas de UI ou gráficos sem o usuário pedir. Gráficos são SVG feitos à mão (`barChart` e `stackedChart` em `app.js`).
 - Único script externo: Google Identity Services (`https://accounts.google.com/gsi/client`), carregado sob demanda.
 - Hospedagem: GitHub Pages, publicado pela pasta `app/` via `.github/workflows/ci.yml`.
   URL: `https://jbrenodm.github.io/breno-financeiro/`.
@@ -36,7 +36,7 @@ app/
   manifest.webmanifest, icons/
 scripts/serve.mjs   servidor estático sem dependências (npm run dev)
 scripts/check_formulas.*  confere as fórmulas do Resumo no LibreOffice
-tests/              Playwright: calculos.spec.js, sheets-sync.spec.js, fake-sheets.js (API do Google simulada)
+tests/              Playwright: calculos.spec.js, sheets-sync.spec.js, sessao.spec.js, layout.spec.js, fake-sheets.js (API do Google simulada)
 docs/               decisoes.md (por que as coisas são como são), backlog.md
 ```
 
@@ -104,9 +104,9 @@ Regras:
    A `fn` só pode usar o objeto recebido e IDs, nunca objetos antigos de `data`. Retorne `false` para cancelar.
 3. `writeAll` **grava primeiro e só depois limpa as sobras**. Nunca inverta a ordem: outra pessoa poderia ler a planilha vazia.
 4. Todas as chamadas passam por `run()` (fila serial). Não faça chamadas à API fora dela.
-5. Login: o token dura ~1 h e só pode ser pedido **dentro de um toque do usuário** (popup).
+5. Login: o token dura ~1 h e só pode ser pedido **dentro de um toque do usuário** (popup). Ao abrir, `GAuth.silent()` tenta renovar com `prompt: 'none'`; se falhar, aparece o aviso do topo com "Entrar com Google". "Sair" (`Sync.logout`) revoga o acesso e desliga a renovação automática.
    Em handlers de clique, chame `await needAuth()` **antes** de qualquer `await dialog(...)`. Depois de um await, o navegador bloqueia o popup.
-6. Offline: valores ficam em `pending` e vão quando voltar. Estrutura exige conexão (mostra erro e não altera nada).
+6. Pendente/Publicado: valores ficam em `pending` até a planilha confirmar. `savePending()` dispara o evento `cfp:pending`, que atualiza a barra e as marcações da aba Mês. `Sync.publish()` envia tudo (no toque em "Publicar", o login é pedido antes, se preciso). Estrutura exige conexão (mostra erro e não altera nada).
 7. `renderSafe()` não re-renderiza enquanto um campo `.money` está em foco.
 
 Escopo OAuth: `https://www.googleapis.com/auth/spreadsheets`. Não amplie (ex.: Drive inteiro) sem perguntar.

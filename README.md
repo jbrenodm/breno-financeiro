@@ -12,7 +12,7 @@ A **fonte dos dados é uma planilha do Google Sheets**: você e a Jaqueline lan�
 |---|---|
 | **Mês** | Valor de cada item no mês, agrupado como na planilha, e os totais do mês (saldo, receitas, despesas, gasto real, investimentos, 30% da receita) |
 | **Resumo** | Igual à aba Resumo, mais a tabela anual de cada grupo (com total e média) |
-| **Gráficos** | Receitas × gasto real × investimentos, saldo mensal e despesas por grupo |
+| **Gráficos** | Totais de receitas e despesas do ano, receitas × gasto real × investimentos, receitas empilhadas com despesas por mês e despesas por grupo |
 | **Ajustes** | Grupos, itens e fontes de receita; novo ano; % da receita; conexão com a planilha; backup |
 
 No campo de valor dá para digitar contas: `120+35,90`.
@@ -84,7 +84,8 @@ O cache do service worker é renovado automaticamente a cada deploy.
 - Cada valor digitado é gravado **só naquela célula** da planilha em ~1 s. Os dois podem lançar ao mesmo tempo sem um apagar o do outro.
 - Mudanças de estrutura (criar, renomear, excluir ou reordenar grupos e itens, criar ano) releem a planilha antes de gravar.
 - O app busca novidades ao voltar para ele e a cada 1 minuto com a tela aberta.
-- **Sem internet**, os valores ficam guardados no aparelho (“Offline”) e são enviados depois. Mudanças de estrutura precisam de internet.
+- Um valor digitado fica **Pendente** (campo marcado e contador na aba Mês) até ser gravado na planilha. Depois vira **Publicado**. Se não houver sessão, o botão **Publicar** pede o login e envia tudo.
+- **Sem internet**, os valores pendentes ficam guardados no aparelho e são enviados depois. Mudanças de estrutura precisam de internet.
 - O acesso do Google dura ~1 hora. Depois disso o topo mostra **Não sincronizado** e um aviso com **Entrar com Google**: um toque renova o acesso.
 
 ## Problemas comuns

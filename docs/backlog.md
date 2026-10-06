@@ -14,7 +14,8 @@
 - [ ] Mensagem amigável quando o e-mail não está em "Usuários de teste".
 
 ## Melhorias
-- [ ] Renovação do acesso menos intrusiva (hoje: botão "Entrar" a cada ~1 h).
+- [ ] Renovação do acesso menos intrusiva. Hoje a renovação silenciosa funciona no computador, mas falha ao recarregar no Android: o topo mostra "Não sincronizado" e o botão "Entrar com Google". Solução de longo prazo em outro projeto (ver decisoes.md).
+- [ ] Validar Pendente/Publicado com conta Google real, no computador e no Android.
 - [ ] Indicar no app quem alterou por último ou quando (exigiria coluna extra: decidir se muda o formato → `cfp-2`).
 - [ ] Botão "Recriar abas de visualização" (reaplicar `headerValues`/`formatRequests` numa planilha existente) para corrigir fórmulas sem perder dados.
 - [ ] Exportar o ano para .xlsx no layout da planilha antiga.
