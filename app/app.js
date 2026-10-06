@@ -818,6 +818,15 @@ function applyTheme() {
 }
 
 /* ---------- inicialização ---------- */
+function mostrarEntrada(modo) {
+  const comPlanilha = modo === 'sheet';
+  $('#entradaTexto').textContent = comPlanilha
+    ? 'Entre com sua conta Google para sincronizar a planilha. Os dados deste aparelho continuam salvos.'
+    : 'Entre com sua conta Google para sincronizar a planilha compartilhada com a Jaqueline.';
+  $('#verSemSync').hidden = !comPlanilha;
+  $('#usarLocal').hidden = comPlanilha;
+  $('#entrada').hidden = false;
+}
 applyTheme();
 $$('.tabbar button').forEach((b) => b.addEventListener('click', () => { ui.tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
 $('#prevBtn').addEventListener('click', () => step(-1));
@@ -825,16 +834,19 @@ $('#nextBtn').addEventListener('click', () => step(1));
 $('#syncBtn').addEventListener('click', () => Sync.refresh());
 $('#authBtn').addEventListener('click', () => Sync.login());
 $('#usarLocal').addEventListener('click', () => { settings.localOnly = true; saveSettings(); $('#entrada').hidden = true; });
+$('#verSemSync').addEventListener('click', () => { $('#entrada').hidden = true; });
 $('#entrarGoogle').addEventListener('click', async () => {
   if (!(await Sync.login())) return;
-  $('#entrada').hidden = true; ui.tab = 'ajustes'; render();
-  toast('Crie ou conecte a planilha em Ajustes');
+  $('#entrada').hidden = true;
+  if (Sync.mode() === 'local') { ui.tab = 'ajustes'; render(); toast('Crie ou conecte a planilha em Ajustes'); }
 });
 readInviteHash();
 if (Sync.mode() === 'sheet') ui.tab = 'graficos';
-$('#entrada').hidden = Sync.mode() === 'sheet' || settings.localOnly;
 render();
-Sync.boot();
+Sync.boot().then((ok) => {
+  if (!ok) mostrarEntrada('sheet');
+  else if (Sync.mode() === 'local' && !settings.localOnly) mostrarEntrada('local');
+});
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
   navigator.serviceWorker.register('sw.js').catch(() => {});

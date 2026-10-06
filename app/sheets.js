@@ -444,8 +444,8 @@ const Sync = (() => {
   function boot() {
     setInterval(() => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid() && !busy) refresh(); }, 60000);
     document.addEventListener('visibilitychange', () => { if (mode() === 'sheet' && document.visibilityState === 'visible' && GAuth.valid()) refresh(); });
-    if (mode() === 'local') set('local');
-    else GAuth.silent().then((ok) => (ok ? refresh() : fail(authErr())));
+    if (mode() === 'local') { set('local'); return Promise.resolve(true); }
+    return GAuth.silent().then((ok) => { if (ok) refresh(); else fail(authErr()); return ok; });
   }
   return { setValue, refresh, mutate, setMeta, login, logout, createSheet, linkSheet, disconnect, paint, boot, mode, get pendingCount() { return pending.length; } };
 })();

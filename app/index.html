@@ -29,7 +29,7 @@
   </div>
 </header>
 <div id="authBanner" class="auth-banner" hidden>
-  <span>Sincronização pausada. Os dados deste aparelho continuam aqui.</span>
+  <span>Entre com Google para sincronizar.</span>
   <button class="btn sm primary" id="authBtn" type="button">Entrar com Google</button>
 </div>
 
@@ -53,8 +53,9 @@
 <section id="entrada" class="entrada" hidden>
   <div class="entrada-card">
     <h1>Controle Financeiro</h1>
-    <p>Entre com sua conta Google para sincronizar a planilha compartilhada com a Jaqueline.</p>
+    <p id="entradaTexto"></p>
     <button class="btn block primary" id="entrarGoogle" type="button">Entrar com Google</button>
+    <button class="btn block" id="verSemSync" type="button" hidden>Ver sem sincronizar</button>
     <button class="btn block" id="usarLocal" type="button">Usar só neste aparelho</button>
   </div>
 </section>

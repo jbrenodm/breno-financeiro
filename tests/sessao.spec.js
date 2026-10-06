@@ -84,6 +84,9 @@ test('ao recarregar, sem renovação silenciosa, mostra Entrar', async ({ browse
   await A.reload();
   await expect(A.locator('#syncLabel')).toHaveText('Não sincronizado');
   await expect(A.locator('#authBanner')).toBeVisible();
+  await expect(A.locator('#entrada')).toBeVisible();
+  await A.locator('#verSemSync').click();
+  await expect(A.locator('#entrada')).toBeHidden();
 });
 
 test('sair da conta Google não renova sozinho ao recarregar', async ({ browser }) => {

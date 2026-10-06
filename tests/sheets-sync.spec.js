@@ -42,7 +42,7 @@ test('criar planilha, convidar e editar em dois aparelhos', async ({ browser }) 
   const B = await newUser();
   await B.goto(invite);
   await expect(B.locator('#syncLabel')).toHaveText('Não sincronizado');
-  await B.locator('#authBtn').click();
+  await B.locator('#entrarGoogle').click();
   await expect(B.locator('#syncLabel')).toHaveText('Sincronizado');
   await expect(B.locator('[data-tab="graficos"]')).toHaveClass(/active/);
   await B.locator('[data-tab="mes"]').click();

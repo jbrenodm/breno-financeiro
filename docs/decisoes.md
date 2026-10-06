@@ -8,7 +8,7 @@ Registro curto do porquê das escolhas. Acrescente novas no topo, com data.
 
 ## 2026-10-05 — Entrada com login e renovação silenciosa do acesso
 - **Problema:** o token do Google dura ~1 h e fica só na memória. Ao recarregar, o app pedia "Entrar" de novo.
-- **Decisão:** não guardar o token em `localStorage`. Ao abrir com planilha conectada, o app tenta renovar sem janela (`prompt: 'none'`). Se falhar, mostra um aviso no topo com botão "Entrar com Google" e mantém os dados do aparelho visíveis.
+- **Decisão:** não guardar o token em `localStorage`. Ao abrir com planilha conectada, o app tenta renovar sem janela (`prompt: 'none'`). Se falhar, mostra a tela de entrada com "Entrar com Google" e "Ver sem sincronizar", que deixa os dados do aparelho visíveis sem sincronizar. Um aviso discreto no topo mantém o botão de entrar disponível.
 - **Primeiro uso** (sem planilha e sem escolha de "só neste aparelho"): tela de entrada com "Entrar com Google" e "Usar só neste aparelho".
 - **Consequência:** a primeira aba depois de conectar é Gráficos.
 - **Alternativas recusadas:** token em `localStorage` (qualquer script da página teria acesso ao token por até 1 h) e bloquear a tela inteira quando a sessão expira (esconderia dados já sincronizados).
